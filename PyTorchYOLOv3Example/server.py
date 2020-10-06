@@ -35,7 +35,7 @@ def upload():
         run(upload_path, conf, detected_path)
 
         # return render_template("upload_ok.html", userinput = user_input, val1=time.time(), path = detected_path)
-        path = "/images/" + "output" + secure_filename(f.filename)
+        path = "./images/" + "output" + secure_filename(f.filename)
         return render_template("upload_ok.html", path = path, val1 = time.time())
     return render_template("upload.html")
 
