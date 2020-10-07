@@ -10,9 +10,16 @@
 
 依赖： NCNN、 OpenCV 
 
+# 2. PyTorchYOLOv3Example
+
+使用flask搭建一个PyTorchYOLOv3的演示界面。项目模型来自于PyTorchYOLOv3开源项目。
+
+依赖: Flask、 PyTorch 
+
 安卓端部署：
 
 - [x] 最简安卓部署案例——不加RNN的CRNN模型的安卓端部署
+- [x] 将Chineseocr_lite项目打包成安卓app
 
 服务端部署：
 
