@@ -33,7 +33,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fopenmp")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-#FILE(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+FILE(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
 add_library( # Sets the name of the library.
         native-lib
@@ -42,8 +42,8 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        native-lib.cpp)
-#             native-lib.cpp ${SRCS})
+#        native-lib.cpp)
+             native-lib.cpp ${SRCS})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

@@ -20,10 +20,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.content.res.AssetManager;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         button = (Button)findViewById(R.id.choose);
         imageView = (ImageView)findViewById(R.id.imageview);
+
+        AssetManager am = getAssets();
+        String s = stringFromJNI(am);
+        Log.i("###OCR###", s);
+
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view)
@@ -57,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
 //        TextView tv = findViewById(R.id.sample_text);
 //        tv.setText(stringFromJNI());
+
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
@@ -79,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                         imageView.setImageURI(uri);
                     }
-//                    bitmap = getBitmap(this.getContentResolver(), uri);
-//                    imageView.setImageBitmap(bitmap);
-//                        imageView.setImageURI(uri);
                 }
             }
         }
@@ -107,60 +112,9 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(mutableBitmap);//imageView: 定义在xml布局中的ImagView控件
     }
 
-//    public static final Bitmap getBitmap(ContentResolver cr, Uri url) throws FileNotFoundException, IOException {
-//        InputStream input = cr.openInputStream(url);
-//
-//        BitmapFactory.Options opts = new BitmapFactory.Options();
-//        opts.inTempStorage = new byte[100 * 1024];
-//        opts.inPurgeable = true;
-//
-//        String factory = Build.BRAND.toUpperCase();
-//        if (factory.contains("HUAWEI")||factory.contains("HONOR")) {
-//            opts.inSampleSize = 2;
-//        }
-//
-//        opts.inInputShareable = true;
-//        opts.inPreferredConfig = Bitmap.Config.RGB_565;
-//
-//        Bitmap bitmap = BitmapFactory.decodeStream(input, null, opts);
-//        input.close();
-//        return bitmap;
-//    }
-
-
-//    public void onClick(View v) {
-//        //调用相册
-////        Intent intent = new Intent(Intent.ACTION_PICK,
-////                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-////        startActivityForResult(intent, IMAGE);
-//    }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        //获取图片路径
-//        if (requestCode == IMAGE && resultCode == Activity.RESULT_OK && data != null) {
-//            Uri selectedImage = data.getData();
-//            String[] filePathColumns = {MediaStore.Images.Media.DATA};
-//            Cursor c = getContentResolver().query(selectedImage, filePathColumns, null, null, null);
-//            c.moveToFirst();
-//            int columnIndex = c.getColumnIndex(filePathColumns[0]);
-//            String imagePath = c.getString(columnIndex);
-//            showImage(imagePath);
-//            c.close();
-//        }
-//    }
-
-//    //加载图片
-//    private void showImage(String imaePath){
-//        Bitmap bm = BitmapFactory.decodeFile(imaePath);
-//        ((ImageView)findViewById(R.id.image)).setImageBitmap(bm);
-//    }
-
-
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
+    public native String stringFromJNI(AssetManager am);
 }
