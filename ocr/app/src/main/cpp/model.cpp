@@ -3,8 +3,10 @@
 //
 
 #include "model.h"
+#include "utils.h"
 
 #define CRNN_LSTM
+
 
 model::model()
 {}
@@ -23,9 +25,20 @@ int model::init(AAssetManager *mgr)
     ret5 = this->recnet.load_param(mgr, "crnn_lite_dw_dense.param");
     ret6 = this->recnet.load_model(mgr, "crnn_lite_dw_dense.bin");
 #endif
+
+    char * buffer = readKeysFromAssets(mgr);
+    alphabetChinese = buffer;
+    if(buffer == nullptr)
+    {
+        return -1;
+    }else{
+        LOGI("%s",alphabetChinese.c_str());
+    }
     return ret1 || ret2 || ret3 ||ret4 ||ret5 ||ret6;
 }
 
 model::~model()
 {
 }
+
+
