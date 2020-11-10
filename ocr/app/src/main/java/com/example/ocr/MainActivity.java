@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 //    private static final int IMAGE = 1;
     private Button button;
     private ImageView imageView;
+    private AssetManager am;
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -45,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
         button = (Button)findViewById(R.id.choose);
         imageView = (ImageView)findViewById(R.id.imageview);
 
-        AssetManager am = getAssets();
-        String s = stringFromJNI(am);
-        Log.i("###OCR###", s);
+        am = getAssets();
+//        String s = stringFromJNI(am);
+//        Log.i("###OCR###", s);
 
         button.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     {
                         // 读取图片
                         bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+                        stringFromJNI(am, bitmap);
                         int [] rects = {0,0,2,2};
                         drawRectangles(bitmap, rects);
                     }catch(IOException e)
@@ -116,5 +118,5 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI(AssetManager am);
+    public native String stringFromJNI(AssetManager am, Bitmap bitmap);
 }
