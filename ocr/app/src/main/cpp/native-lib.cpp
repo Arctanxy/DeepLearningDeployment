@@ -42,13 +42,15 @@ Java_com_example_ocr_MainActivity_stringFromJNI(
     static AAssetManager *mgr = nullptr;
     mgr = AAssetManager_fromJava(env, assetManager);
     int ret =  net.init(mgr);
-    cv::Mat img_bgr = convertToMat(env, bitmap);
-    net.detect(img_bgr, 640);
     if(ret)
     {
         hello = "init failed ";
     }else{
         hello = "init sucessed";
     }
+    LOGI("######%s\n", hello.c_str());
+    cv::Mat img_bgr = convertToMat(env, bitmap);
+    net.detect(img_bgr, 640);
+
     return env->NewStringUTF(hello.c_str());
 }

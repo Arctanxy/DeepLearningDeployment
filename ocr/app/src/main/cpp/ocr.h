@@ -58,8 +58,8 @@ class OCR
         const float mean_vals_crnn[1] = { 127.5};
         const float norm_vals_crnn[1] = { 1.0 /127.5};
 
-//        std::vector<std::string>   alphabetChinese;
-        std::string alphabetChinese;
+        std::vector<std::string>   alphabetChinese;
+//        std::string alphabetChinese;
 
 };
 

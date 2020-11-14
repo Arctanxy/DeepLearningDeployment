@@ -1,7 +1,7 @@
 #include "ocr.h"
 #include <queue>
 
-#define CRNN_LSTM 1
+#define CRNN_LSTM 0
 
 
 char *readKeysFromAssets(AAssetManager *mgr) {
@@ -36,8 +36,8 @@ OCR::OCR()
 int OCR::init(AAssetManager *mgr)
 {
     int ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8;
-    ret1 = this->psenet.load_param(mgr, "crnn_lite_dw_dense.param");
-    ret2 = this->psenet.load_model(mgr, "crnn_lite_dw_dense.bin");
+    ret1 = this->psenet.load_param(mgr, "psenet_lite_mbv2.param");
+    ret2 = this->psenet.load_model(mgr, "psenet_lite_mbv2.bin");
     ret3 = this->angle_net.load_param(mgr, "shufflenetv2_05_angle.param");
     ret4 = this->angle_net.load_model(mgr, "shufflenetv2_05_angle.bin");
 #if CRNN_LSTM
@@ -55,19 +55,34 @@ int OCR::init(AAssetManager *mgr)
 #endif
 
     char * buffer = readKeysFromAssets(mgr);
-    alphabetChinese = buffer;
-    if(buffer == nullptr)
-    {
-    return -1;
-    }else{
-    LOGI("%s",alphabetChinese.c_str());
+
+    if (buffer != NULL) {
+        std::istringstream inStr(buffer);
+        std::string line;
+        while (getline(inStr, line)) {
+            alphabetChinese.emplace_back(line);
+        }
+        free(buffer);
+    } else {
+        LOGE(" txt file not found");
     }
+    LOGI("Init Models Success!");
+//
+//    alphabetChinese = buffer;
+//    if(buffer == nullptr)
+//    {
+//    return -1;
+//    }else{
+////    LOGI("%s",alphabetChinese.c_str());
+//        LOGI("%s", "loaded alphabet\n");
+//    }
+    LOGI("%d, %d, %d, %d, %d, %d, %d, %d", (ret1, ret2, ret3, ret4, ret5, ret6, ret7, ret8));
     return ret1 || ret2 || ret3 ||ret4 ||ret5 ||ret6 || ret7 || ret8;
 }
 
 
 
-std::vector<std::string> crnn_deocde(const ncnn::Mat score , std::string alphabetChinese) {
+std::vector<std::string> crnn_deocde(const ncnn::Mat score , std::vector<std::string> alphabetChinese) {
     float *srcdata = (float* ) score.data;
     std::vector<std::string> str_res;
     int last_index = 0;  
@@ -82,12 +97,9 @@ std::vector<std::string> crnn_deocde(const ncnn::Mat score , std::string alphabe
             }
         }
         if (max_index >0 && (not (i>0 && max_index == last_index))  ){
-//            std::cout <<  max_index - 1 << std::endl;
-//            std::string temp_str =  utf8_substr2(alphabetChinese,max_index - 1,1)  ;
-            std::string s;
-            s = alphabetChinese[max_index -1];
-            str_res.push_back(s);
-//            str_res.push_back(alphabetChinese[max_index-1]);
+
+                str_res.emplace_back(alphabetChinese[max_index - 1]);
+
         }
 
 
@@ -311,13 +323,14 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
 
     // std::cout << "输入尺寸 (" << in.w << ", " << in.h << ")" << std::endl;
 
+    LOGI("正在检测\n");
     ncnn::Extractor ex = psenet.create_extractor();
     ex.set_num_threads(num_thread);
     ex.input("input", in);
     ncnn::Mat preds;
     double time1 = static_cast<double>( cv::getTickCount());
     ex.extract("out", preds);
-    std::cout << "psenet前向时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
+//    std::cout << "psenet前向时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
     // std::cout << "网络输出尺寸 (" << preds.w << ", " << preds.h << ", " << preds.c << ")" << std::endl;
 
     time1 = static_cast<double>( cv::getTickCount());
@@ -341,15 +354,17 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
         bboxs.emplace_back(points);
 
     }
-    std::cout << "psenet decode 时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
-    std::cout << "boxzie" << bboxs.size() << std::endl;
+    LOGI("检测到%d个文本框, %d个contourmap", (bboxs.size(), contoursMap.size()));
+//    std::cout << "psenet decode 时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
+//    std::cout << "boxzie" << bboxs.size() << std::endl;
 
     auto result = draw_bbox(im_bgr, bboxs);
-    cv::imwrite("./imgs/result.jpg", result);
+//    cv::imwrite("./imgs/result.jpg", result);
 
     time1 = static_cast<double>( cv::getTickCount());
     //开始行文本角度检测和文字识别
-    std::cout << "预测结果：\n";
+//    std::cout << "预测结果：\n";
+    LOGI("正在识别\n");
     for (int i = 0; i < rects.size() ; i++ ){
         cv::RotatedRect  temprect = rects[i];
         // std::cout<<  temprect.size.width << "," << temprect.size.height << "," <<  temprect.center.x <<
@@ -411,7 +426,7 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
 
         char *svavePath = new char[25];
         sprintf( svavePath, "debug_im/%d.jpg", i);
-        cv::imwrite(svavePath,part_im);
+//        cv::imwrite(svavePath,part_im);
         // part_im = cv::imread("test.jpg");
 
         cv::Mat img2 = part_im.clone();
