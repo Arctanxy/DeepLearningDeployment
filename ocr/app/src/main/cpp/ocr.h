@@ -37,13 +37,10 @@ class OCR
     public:
         OCR();
         int init(AAssetManager *mgr);
-        void detect(cv::Mat im_bgr,int long_size);
+    std::vector<std::string> detect(cv::Mat im_bgr,int long_size);
 
 
     private:
-       
-
-
 
         ncnn::Net  psenet,crnn_net,crnn_vertical_net,angle_net;
         ncnn::Mat  img;

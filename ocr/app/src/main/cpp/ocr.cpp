@@ -308,9 +308,10 @@ cv::Mat matRotateClockWise90(cv::Mat src)
 }
 
 
-void  OCR::detect(cv::Mat im_bgr,int long_size)
+std::vector<std::string>  OCR::detect(cv::Mat im_bgr,int long_size)
 {
 
+    std::vector<std::string> result;
         // 图像缩放
     auto im = resize_img(im_bgr, long_size);
 
@@ -358,7 +359,7 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
 //    std::cout << "psenet decode 时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
 //    std::cout << "boxzie" << bboxs.size() << std::endl;
 
-    auto result = draw_bbox(im_bgr, bboxs);
+//    auto result = draw_bbox(im_bgr, bboxs);
 //    cv::imwrite("./imgs/result.jpg", result);
 
     time1 = static_cast<double>( cv::getTickCount());
@@ -557,12 +558,18 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
         // std::cout << "网络输出尺寸 (" << crnn_preds.w << ", " << crnn_preds.h << ", " << crnn_preds.c << ")" << std::endl;
 
 
-        auto res_pre = crnn_deocde(crnn_preds,alphabetChinese);
+        std::vector<std::string> res_pre = crnn_deocde(crnn_preds,alphabetChinese);
 
-        for (int i=0; i<res_pre.size();i++){
-//            std::cout << res_pre[i] ;
-            LOGI("%s", res_pre[i].c_str());
+        for(int i =0;i<res_pre.size();i++)
+        {
+            result.emplace_back(res_pre[i]);
         }
+        result.emplace_back("#");
+
+//        for (int i=0; i<res_pre.size();i++){
+////            std::cout << res_pre[i] ;
+//            LOGI("%s", res_pre[i].c_str());
+//        }
 //        std::cout  <<std::endl;
 
 
@@ -571,7 +578,7 @@ void  OCR::detect(cv::Mat im_bgr,int long_size)
 
     LOGI("角度识别时间：%lf s", (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency());
 
-
+    return result;
 }
 
 

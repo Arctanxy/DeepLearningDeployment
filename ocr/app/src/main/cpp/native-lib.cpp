@@ -4,7 +4,7 @@
 #include "ocr.h"
 #include <android/asset_manager_jni.h>
 
-//todo: cv::Mat convertToMat(jobject bitmap)
+OCR net;
 
 cv::Mat convertToMat(JNIEnv* env,jobject bitmap)
 {
@@ -33,24 +33,49 @@ cv::Mat convertToMat(JNIEnv* env,jobject bitmap)
 }
 
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_ocr_MainActivity_stringFromJNI(
-        JNIEnv* env,
-        jobject /* this */, jobject assetManager, jobject bitmap) {
-    std::string hello = "Hello from C++";
-    OCR net;
+//extern "C" JNIEXPORT jstring JNICALL
+//Java_com_example_ocr_MainActivity_stringFromJNI(
+//        JNIEnv* env,
+//        jobject /* this */, jobject assetManager, jobject bitmap) {
+//    std::string hello = "Hello from C++";
+//    OCR net;
+//    static AAssetManager *mgr = nullptr;
+//    mgr = AAssetManager_fromJava(env, assetManager);
+//    int ret =  net.init(mgr);
+//    if(ret)
+//    {
+//        hello = "init failed ";
+//    }else{
+//        hello = "init sucessed";
+//    }
+//    LOGI("######%s\n", hello.c_str());
+//    cv::Mat img_bgr = convertToMat(env, bitmap);
+//    net.detect(img_bgr, 640);
+//
+//    return env->NewStringUTF(hello.c_str());
+//}
+
+extern "C" JNIEXPORT jint JNICALL
+        Java_com_example_ocr_MainActivity_initModel(
+        JNIEnv * env, jobject, jobject assetManager
+        )
+{
     static AAssetManager *mgr = nullptr;
     mgr = AAssetManager_fromJava(env, assetManager);
-    int ret =  net.init(mgr);
-    if(ret)
-    {
-        hello = "init failed ";
-    }else{
-        hello = "init sucessed";
-    }
-    LOGI("######%s\n", hello.c_str());
-    cv::Mat img_bgr = convertToMat(env, bitmap);
-    net.detect(img_bgr, 640);
+    int ret = net.init(mgr);
+    return ret;
+}
 
+extern "C" JNIEXPORT jstring JNICALL
+        Java_com_example_ocr_MainActivity_detect(
+        JNIEnv* env,
+        jobject /* this */, jobject bitmap) {
+    cv::Mat img_bgr = convertToMat(env, bitmap);
+    std::vector<std::string> res = net.detect(img_bgr, 640);
+    for(auto s:res)
+    {
+        LOGI("%s", s.c_str());
+    }
+    std::string hello = "hello ";
     return env->NewStringUTF(hello.c_str());
 }

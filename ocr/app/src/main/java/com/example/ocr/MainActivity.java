@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = (ImageView)findViewById(R.id.imageview);
 
         am = getAssets();
+        initModel(am);
 //        String s = stringFromJNI(am);
 //        Log.i("###OCR###", s);
 
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
                     {
                         // 读取图片
                         bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-                        stringFromJNI(am, bitmap);
+//                        stringFromJNI(am, bitmap);
+                        detect(bitmap);
                         int [] rects = {0,0,2,2};
                         drawRectangles(bitmap, rects);
                     }catch(IOException e)
@@ -118,5 +120,7 @@ public class MainActivity extends AppCompatActivity {
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI(AssetManager am, Bitmap bitmap);
+//    public native String stringFromJNI(AssetManager am, Bitmap bitmap);
+    public native int initModel(AssetManager am);
+    public native String detect(Bitmap bitmap);
 }
