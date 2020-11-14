@@ -1,6 +1,10 @@
 #include "ocr.h"
 #include <queue>
 
+#include <regex>
+
+#include <algorithm>
+
 #define CRNN_LSTM 0
 
 
@@ -355,7 +359,38 @@ std::vector<std::string>  OCR::detect(cv::Mat im_bgr,int long_size)
         bboxs.emplace_back(points);
 
     }
-    LOGI("检测到%d个文本框, %d个contourmap", (bboxs.size(), contoursMap.size()));
+//    LOGI("检测到%d个文本框, %d个contourmap", (bboxs.size(), contoursMap.size()));
+    // warning： 为了绘图方便，只给java那边传一个五角度的框
+    // 需要倾斜框的请自行修改
+
+    for(std::vector<cv::Point> pts:bboxs)
+    {
+        result.emplace_back("*");  // *号代表下面四个元素是坐标
+        float min_x = 1e5, min_y = 1e5, max_x = 0, max_y = 0;
+        for(int i = 0;i<4;i++)
+        {
+            if(pts[i].x < min_x)
+            {
+                min_x = pts[i].x;
+            }
+            if(pts[i].y < min_y)
+            {
+                min_y = pts[i].y;
+            }
+            if(pts[i].x > max_x)
+            {
+                max_x = pts[i].x;
+            }
+            if(pts[i].y > max_y)
+            {
+                max_y = pts[i].y;
+            }
+        }
+        result.emplace_back(std::to_string(min_x));
+        result.emplace_back(std::to_string(min_y));
+        result.emplace_back(std::to_string(max_x));
+        result.emplace_back(std::to_string(max_y));
+    }
 //    std::cout << "psenet decode 时间:" << (static_cast<double>( cv::getTickCount()) - time1) / cv::getTickFrequency() << "s" << std::endl;
 //    std::cout << "boxzie" << bboxs.size() << std::endl;
 
@@ -560,11 +595,18 @@ std::vector<std::string>  OCR::detect(cv::Mat im_bgr,int long_size)
 
         std::vector<std::string> res_pre = crnn_deocde(crnn_preds,alphabetChinese);
 
+        result.emplace_back("#"); // # 号代表下面的所有字符是一个文本框中的文字
+        std::string s = "";
         for(int i =0;i<res_pre.size();i++)
         {
-            result.emplace_back(res_pre[i]);
+//            std::regex newlines_re("\n+");
+//            std::string res = std::regex_replace(res_pre[i], newlines_re, "");
+            std::string res = res_pre[i];
+            res.erase(std::remove(res.begin(), res.end(), '\n'), res.end());
+            s += res;
+//            result.emplace_back(res);
         }
-        result.emplace_back("#");
+        result.emplace_back(s);
 
 //        for (int i=0; i<res_pre.size();i++){
 ////            std::cout << res_pre[i] ;
