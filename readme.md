@@ -22,7 +22,7 @@
 安卓端部署：
 
 - [x] 最简安卓部署案例——不加RNN的CRNN模型的安卓端部署
-- [ ] 将Chineseocr_lite项目打包成安卓app
+- [x] 将Chineseocr_lite项目打包成安卓app
 
 服务端部署：
 
