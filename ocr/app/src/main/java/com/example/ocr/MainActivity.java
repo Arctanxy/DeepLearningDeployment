@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 //    private static final int IMAGE = 1;
     private Button button;
     private ImageView imageView;
+    private TextView textView;
     private AssetManager am;
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -45,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         button = (Button)findViewById(R.id.choose);
         imageView = (ImageView)findViewById(R.id.imageview);
+        textView = (TextView)findViewById(R.id.textview);
 
-        am = getAssets();
+
+                am = getAssets();
         initModel(am);
 //        String s = stringFromJNI(am);
 //        Log.i("###OCR###", s);
@@ -89,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
                         String [] rects_string_list = rects_strings.split(",");
 //                        int [] rects = {0,0,2,2};
                         drawRectangles(bitmap, rects_string_list);
+                        String [] ocr_res = result.split("#");
+                        String display_info = "";
+                        for(int i = 1;i<ocr_res.length;i++)
+                        {
+                            display_info += ocr_res[i];
+                            display_info += "\n";
+                        }
+                        textView.setText(display_info);
                     }catch(IOException e)
                     {
                         e.printStackTrace();
