@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#define CRNN_LSTM 0
+#define CRNN_LSTM 1
 
 
 char *readKeysFromAssets(AAssetManager *mgr) {

@@ -72,10 +72,49 @@ extern "C" JNIEXPORT jstring JNICALL
         jobject /* this */, jobject bitmap) {
     cv::Mat img_bgr = convertToMat(env, bitmap);
     std::vector<std::string> res = net.detect(img_bgr, 640);
-    for(auto s:res)
+    std::string result = "";
+    int i = 0;
+//    for(auto a:res)
+//    {
+//        LOGI("%s", a.c_str());
+//    }
+    while(i < res.size())
     {
-        LOGI("%s", s.c_str());
+
+//        处理边框坐标
+        if(res[i] == "*")
+        {
+//            result += "[";
+            result += res[i + 1];
+            result += ",";
+            result += res[i + 2];
+            result += ",";
+            result += res[i + 3];
+            result += ",";
+            result += res[i + 4];
+//            result += "]";
+            result += ",";
+            i += 5;
+            continue;
+        }
+        result += res[i];
+        i += 1;
+//        处理文本
+//            文本留到java端处理
+//        if(res[i] == "#")
+//        {
+//            result += ""
+//        }
     }
-    std::string hello = "hello ";
-    return env->NewStringUTF(hello.c_str());
+//    for(auto s:res)
+//    {
+////        LOGI("%s", s.c_str());
+//        if(s == "*")
+//        {
+//            result += s;
+//            result += ",";
+//        }
+//    }
+//    std::string hello = "hello ";
+    return env->NewStringUTF(result.c_str());
 }

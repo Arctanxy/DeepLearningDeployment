@@ -83,9 +83,12 @@ public class MainActivity extends AppCompatActivity {
                         // 读取图片
                         bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
 //                        stringFromJNI(am, bitmap);
-                        detect(bitmap);
-                        int [] rects = {0,0,2,2};
-                        drawRectangles(bitmap, rects);
+                        String result = detect(bitmap);
+                        Log.i("OCRLITEJAVA",result);
+                        String rects_strings = result.split("#")[0];
+                        String [] rects_string_list = rects_strings.split(",");
+//                        int [] rects = {0,0,2,2};
+                        drawRectangles(bitmap, rects_string_list);
                     }catch(IOException e)
                     {
                         e.printStackTrace();
@@ -96,18 +99,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private int toInt(String num)
+    {
+        int a = 0;
+        float b = 0.0f;
+        try {
+            b = Float.parseFloat(num);
+            a = (int)b;
 
+        } catch (NumberFormatException e) {
 
-    private void drawRectangles(Bitmap imageBitmap, int[] Rects) {
+            e.printStackTrace();
+
+        }
+        return a;
+    }
+
+    private void drawRectangles(Bitmap imageBitmap, String [] Rects) {
         int left, top, right, bottom;
         Bitmap mutableBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(mutableBitmap);
         Paint paint = new Paint();
-        for (int i = 0; i < 1; i++) {
-            left = Rects[i * 4];
-            top = Rects[i * 4 + 1];
-            right = Rects[i * 4 + 2];
-            bottom = Rects[i * 4 + 3];
+        for (int i = 0; i < Rects.length / 4; i++) {
+            left = toInt(Rects[i * 4]);
+            top = toInt(Rects[i * 4 + 1]);
+            right = toInt(Rects[i * 4 + 2]);
+            bottom = toInt(Rects[i * 4 + 3]);
             paint.setColor(Color.RED);
             paint.setStyle(Paint.Style.STROKE);//不填充
             paint.setStrokeWidth(10);  //线的宽度
