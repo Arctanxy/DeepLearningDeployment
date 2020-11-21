@@ -16,6 +16,11 @@
 
 依赖: Flask、 PyTorch 
 
+# 3. ocr
+
+将ChineseocrLite项目打包成安卓应用
+
+依赖：NDK18、NCNN、OpenCV
 
 # todo list
 
